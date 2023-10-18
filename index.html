@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recetas Keto</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        .delete-button {
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recetas Keto</h1>
+    
+    <!-- Formulario para agregar recetas -->
+    <div id="recipe-form">
+        <h2>Agregar Receta</h2>
+        <label for="recipeName">Nombre de la Receta:</label>
+        <input type="text" id="recipeName" required>
+        <label for="ingredients">Ingredientes:</label>
+        <textarea id="ingredients" rows="4" required></textarea>
+        <label for="instructions">Instrucciones:</label>
+        <textarea id="instructions" rows="4" required></textarea>
+        <button id="add-recipe-button">Subir Receta</button>
+    </div>
+    
+    <h2>Recetas Guardadas</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre de la Receta</th>
+                <th>Ingredientes</th>
+                <th>Instrucciones</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody id="recipeList">
+        </tbody>
+    </table>
+    
+    <script>
+        // Recetas globales
+        let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
+        
+        // Agregar receta
+        document.getElementById('add-recipe-button').addEventListener('click', function () {
+            const recipeName = document.getElementById('recipeName').value;
+            const ingredients = document.getElementById('ingredients').value;
+            const instructions = document.getElementById('instructions').value;
+            
+            // Guarda la receta en el arreglo de recetas
+            const recipe = {
+                name: recipeName,
+                ingredients: ingredients,
+                instructions: instructions
+            };
+            recipes.push(recipe);
+            localStorage.setItem('recipes', JSON.stringify(recipes));
+            
+            // Limpia el formulario
+            document.getElementById('recipeName').value = '';
+            document.getElementById('ingredients').value = '';
+            document.getElementById('instructions').value = '';
+            
+            // Muestra las recetas actualizadas
+            displayRecipes();
+        });
+
+        // Función para eliminar una receta
+        function deleteRecipe(index) {
+            recipes.splice(index, 1);
+            localStorage.setItem('recipes', JSON.stringify(recipes));
+            displayRecipes();
+        }
+
+        // Función para mostrar todas las recetas en una tabla
+        function displayRecipes() {
+            const recipeList = document.getElementById('recipeList');
+            recipeList.innerHTML = ''; // Limpia la tabla para evitar duplicados
+            recipes.forEach(function(recipe, index) {
+                const newRow = recipeList.insertRow();
+                const nameCell = newRow.insertCell(0);
+                const ingredientsCell = newRow.insertCell(1);
+                const instructionsCell = newRow.insertCell(2);
+                const deleteCell = newRow.insertCell(3);
+                
+                nameCell.innerHTML = recipe.name;
+                ingredientsCell.innerHTML = recipe.ingredients;
+                instructionsCell.innerHTML = recipe.instructions;
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Eliminar';
+                deleteButton.className = 'delete-button';
+                deleteButton.addEventListener('click', () => deleteRecipe(index));
+                deleteCell.appendChild(deleteButton);
+            });
+        }
+
+        // Muestra las recetas iniciales
+        displayRecipes();
+    </script>
+</body>
+</html>
